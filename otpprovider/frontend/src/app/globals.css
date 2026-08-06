@@ -5,3 +5,47 @@
 html, body {
   height: 100%;
 }
+
+/* ---- Marketing site: signature OTP animation ---- */
+@keyframes otp-pop {
+  0% { opacity: 0; transform: translateY(6px) scale(0.85); }
+  60% { opacity: 1; transform: translateY(-2px) scale(1.06); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes bubble-in {
+  0% { opacity: 0; transform: translateY(16px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes check-in {
+  0% { opacity: 0; transform: scale(0.3) rotate(-20deg); }
+  65% { opacity: 1; transform: scale(1.18) rotate(6deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes ring-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.35); }
+  100% { box-shadow: 0 0 0 22px rgba(16, 185, 129, 0); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes wa-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.45); }
+  100% { box-shadow: 0 0 0 14px rgba(37, 211, 102, 0); }
+}
+
+.animate-bubble-in { animation: bubble-in 0.5s cubic-bezier(.2,.8,.2,1) both; }
+.animate-otp-pop { animation: otp-pop 0.4s cubic-bezier(.2,.8,.2,1) both; }
+.animate-check-in { animation: check-in 0.6s cubic-bezier(.2,.8,.2,1) both; }
+.animate-ring-pulse { animation: ring-pulse 1.8s ease-out infinite; }
+.animate-float-slow { animation: float-slow 5s ease-in-out infinite; }
+.animate-wa-pulse { animation: wa-pulse 2s ease-out infinite; }
+
+.font-display { font-family: var(--font-display); }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bubble-in, .animate-otp-pop, .animate-check-in,
+  .animate-ring-pulse, .animate-float-slow, .animate-wa-pulse {
+    animation: none !important;
+  }
+}
