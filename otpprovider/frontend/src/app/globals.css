@@ -4,48 +4,92 @@
 
 html, body {
   height: 100%;
+  scroll-behavior: smooth;
 }
 
-/* ---- Marketing site: signature OTP animation ---- */
-@keyframes otp-pop {
-  0% { opacity: 0; transform: translateY(6px) scale(0.85); }
-  60% { opacity: 1; transform: translateY(-2px) scale(1.06); }
+.font-display { font-family: var(--font-display); }
+
+/* ------------------------------------------------------------------ */
+/*  Signature element: the vertical "live delivery" ticker in the hero */
+/* ------------------------------------------------------------------ */
+@keyframes ticker-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+.animate-ticker {
+  animation: ticker-scroll 16s linear infinite;
+}
+.ticker-mask {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 12%, black 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, black 12%, black 88%, transparent 100%);
+}
+
+/* Horizontal marquee for testimonials */
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee-scroll 42s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+[dir='rtl'] .animate-marquee {
+  animation-direction: reverse;
+}
+
+/* Hero copy + panel entrance */
+@keyframes rise-in {
+  0% { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-rise-in { animation: rise-in 0.7s cubic-bezier(.2,.8,.2,1) both; }
+
+@keyframes panel-in {
+  0% { opacity: 0; transform: translateY(20px) scale(0.98); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
-@keyframes bubble-in {
-  0% { opacity: 0; transform: translateY(16px) scale(0.96); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes check-in {
-  0% { opacity: 0; transform: scale(0.3) rotate(-20deg); }
-  65% { opacity: 1; transform: scale(1.18) rotate(6deg); }
-  100% { opacity: 1; transform: scale(1) rotate(0deg); }
-}
-@keyframes ring-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.35); }
-  100% { box-shadow: 0 0 0 22px rgba(16, 185, 129, 0); }
-}
+.animate-panel-in { animation: panel-in 0.8s cubic-bezier(.2,.8,.2,1) both; }
+
+/* Ambient float for the hero panel */
 @keyframes float-slow {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-8px); }
 }
+.animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+
+/* Signal dot pulse (brand mark + status indicators) */
+@keyframes signal-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(91, 124, 255, 0.5); }
+  100% { box-shadow: 0 0 0 10px rgba(91, 124, 255, 0); }
+}
+.animate-signal-pulse { animation: signal-pulse 2s ease-out infinite; }
+
 @keyframes wa-pulse {
   0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.45); }
   100% { box-shadow: 0 0 0 14px rgba(37, 211, 102, 0); }
 }
-
-.animate-bubble-in { animation: bubble-in 0.5s cubic-bezier(.2,.8,.2,1) both; }
-.animate-otp-pop { animation: otp-pop 0.4s cubic-bezier(.2,.8,.2,1) both; }
-.animate-check-in { animation: check-in 0.6s cubic-bezier(.2,.8,.2,1) both; }
-.animate-ring-pulse { animation: ring-pulse 1.8s ease-out infinite; }
-.animate-float-slow { animation: float-slow 5s ease-in-out infinite; }
 .animate-wa-pulse { animation: wa-pulse 2s ease-out infinite; }
 
-.font-display { font-family: var(--font-display); }
+/* Gentle background aurora behind the hero */
+@keyframes aurora-shift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-3%, 2%) rotate(4deg); }
+}
+.animate-aurora { animation: aurora-shift 18s ease-in-out infinite; }
+
+/* Number count-up fade */
+@keyframes digit-in {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-digit-in { animation: digit-in 0.4s ease-out both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-bubble-in, .animate-otp-pop, .animate-check-in,
-  .animate-ring-pulse, .animate-float-slow, .animate-wa-pulse {
+  .animate-ticker, .animate-marquee, .animate-rise-in, .animate-panel-in,
+  .animate-float-slow, .animate-signal-pulse, .animate-wa-pulse,
+  .animate-aurora, .animate-digit-in {
     animation: none !important;
   }
 }
