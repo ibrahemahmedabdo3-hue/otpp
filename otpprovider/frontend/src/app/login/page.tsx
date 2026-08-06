@@ -47,7 +47,7 @@ export default function LoginPage() {
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-white font-bold text-lg">
             OP
           </div>
-          <h1 className="text-xl font-semibold">OTPProvider Cloud</h1>
+          <h1 className="text-xl font-semibold">OTPProvider </h1>
           <p className="mt-1 text-sm text-gray-500">Sign in to your account</p>
         </div>
 
