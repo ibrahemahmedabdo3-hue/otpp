@@ -27,6 +27,7 @@ const PACKAGES = [
     id: 'starter',
     price: 29,
     verifications: 2000,
+    popular: false,
     channels: { ar: 'SMS فقط', en: 'SMS only' },
     features: {
       ar: ['حتى 2,000 عملية تحقق شهرياً', 'قناة SMS', 'دعم عبر البريد الإلكتروني', 'وثائق API + SDKs جاهزة', 'أوقات تسليم أقل من 3 ثوانٍ'],
@@ -48,6 +49,7 @@ const PACKAGES = [
     id: 'enterprise',
     price: null,
     verifications: null,
+    popular: false,
     channels: { ar: 'كل القنوات + تكامل خاص', en: 'All channels + custom routes' },
     features: {
       ar: ['عمليات تحقق غير محدودة', 'مدير حساب مخصص', 'اتفاقية مستوى خدمة SLA %99.99', 'تكامل مخصص وربط مباشر بالموردين', 'إمكانية الاستضافة الخاصة (VPC/On-prem)'],
