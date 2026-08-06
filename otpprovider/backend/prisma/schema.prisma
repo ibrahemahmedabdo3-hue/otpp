@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  SUPPORT
+  CLIENT
+  RESELLER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum OtpChannel {
+  SMS
+  WHATSAPP
+  EMAIL
+  VOICE
+  TELEGRAM
+  PUSH
+}
+
+enum OtpStatus {
+  PENDING
+  VERIFIED
+  EXPIRED
+  FAILED
+}
+
+enum SiteStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model User {
+  id                String     @id @default(uuid())
+  email             String     @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  role              Role
+  status            UserStatus @default(ACTIVE)
+  companyName       String?
+  resellerId        String?
+  reseller          User?      @relation("ResellerClients", fields: [resellerId], references: [id])
+  clients           User[]     @relation("ResellerClients")
+  twoFactorEnabled  Boolean    @default(false)
+  twoFactorSecret   String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  apiKeys           ApiKey[]
+  refreshTokens     RefreshToken[]
+  wallet            Wallet?
+  otpRequests       OtpRequest[]
+  auditLogs         AuditLog[]
+  loginHistory      LoginHistory[]
+  microSites        MicroSite[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ApiKey {
+  id         String   @id @default(uuid())
+  key        String   @unique
+  label      String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  active     Boolean  @default(true)
+  lastUsedAt DateTime?
+  createdAt  DateTime @default(now())
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance   Decimal  @default(0) @db.Decimal(12, 4)
+  currency  String   @default("USD")
+  updatedAt DateTime @updatedAt
+
+  transactions WalletTransaction[]
+}
+
+model WalletTransaction {
+  id        String   @id @default(uuid())
+  walletId  String
+  wallet    Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  amount    Decimal  @db.Decimal(12, 4)
+  type      String   // CREDIT | DEBIT
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+model OtpRequest {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel     OtpChannel
+  destination String
+  codeHash    String
+  status      OtpStatus  @default(PENDING)
+  attempts    Int        @default(0)
+  maxAttempts Int        @default(5)
+  expiresAt   DateTime
+  verifiedAt  DateTime?
+  createdAt   DateTime   @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  metadata  Json?
+  ip        String?
+  createdAt DateTime @default(now())
+}
+
+model LoginHistory {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email     String
+  success   Boolean
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+}
+
+// A branded sub-domain landing page (e.g. promo.otpprovider.com) fully
+// managed from the admin dashboard. HTML/CSS/JS are stored in the database
+// and rendered live by the backend for any request on that subdomain -
+// nothing is deployed to disk, everything is editable from the admin UI.
+model MicroSite {
+  id              String     @id @default(uuid())
+  subdomain       String     @unique
+  title           String
+  metaDescription String?
+  status          SiteStatus @default(DRAFT)
+  htmlContent     String     @db.Text
+  customCss       String?    @db.Text
+  customJs        String?    @db.Text
+  createdById     String
+  createdBy       User       @relation(fields: [createdById], references: [id])
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}

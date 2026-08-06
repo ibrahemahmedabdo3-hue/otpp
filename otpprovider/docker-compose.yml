@@ -1,0 +1,62 @@
+version: '3.8'
+
+# This file is for local development and self-hosted VPS deployment
+# (`docker compose up`). It is NOT used when deploying to Vercel + Render +
+# Neon — on that path each service deploys independently; see README.md.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: otpprovider_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: otpprovider
+      POSTGRES_PASSWORD: otpprovider_pass
+      POSTGRES_DB: otpprovider
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U otpprovider']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: otpprovider_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://otpprovider:otpprovider_pass@postgres:5432/otpprovider?schema=public
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-change_this_to_a_long_random_string}
+      JWT_ACCESS_EXPIRES: 15m
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
+      FRONTEND_URL: http://localhost:3000
+      ROOT_DOMAIN: ${ROOT_DOMAIN:-otpprovider.com}
+    ports:
+      - '4000:4000'
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000/api/v1}
+        NEXT_PUBLIC_ROOT_DOMAIN: ${ROOT_DOMAIN:-otpprovider.com}
+    container_name: otpprovider_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - '3000:3000'
+
+volumes:
+  postgres_data:
