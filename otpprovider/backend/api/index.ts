@@ -1,10 +1,3 @@
-// Vercel serverless entry point.
-//
-// This wraps the exact same NestJS app used in src/main.ts (same modules,
-// same guards/filters/prefix) inside an Express instance and adapts it to
-// Vercel's Node.js function runtime via serverless-http. The app is built
-// once per warm function instance and reused across invocations (cold start
-// only pays the bootstrap cost once).
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
@@ -29,9 +22,6 @@ async function bootstrap() {
 
   app.use(helmet());
 
-  // Runs on every request regardless of path, via a plain Express
-  // middleware (no route-pattern compilation), so it can never hit the
-  // path-to-regexp "wildcard route" crash. See microsites.module.ts.
   const subdomainMiddleware = app.get(SubdomainMiddleware);
   app.use((req: any, res: any, next: any) => subdomainMiddleware.use(req, res, next));
 
