@@ -5,7 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { buildCorsOptions } from './common/cors';
-
+import { SubdomainMiddleware } from './microsites/subdomain.middleware';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     // In production, restrict to the deployed frontend origin; falls back
