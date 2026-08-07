@@ -67,6 +67,41 @@ export class AuthService {
     return { id: user.id, email: user.email, role: user.role };
   }
 
+  async seedDemoAccounts(key: string) {
+    if (key !== 'otp-seed-2026') {
+      throw new UnauthorizedException('Invalid seed key');
+    }
+
+    const accounts: { email: string; role: any; firstName: string; lastName: string; password: string }[] = [
+      { email: 'superadmin@otpprovider.com', role: 'SUPER_ADMIN', firstName: 'Super', lastName: 'Admin', password: 'ChangeMe123!' },
+      { email: 'admin@otpprovider.com', role: 'ADMIN', firstName: 'System', lastName: 'Admin', password: 'ChangeMe123!' },
+      { email: 'support@otpprovider.com', role: 'SUPPORT', firstName: 'Support', lastName: 'Agent', password: 'ChangeMe123!' },
+      { email: 'reseller@otpprovider.com', role: 'RESELLER', firstName: 'Reseller', lastName: 'Partner', password: 'ChangeMe123!' },
+      { email: 'client@otpprovider.com', role: 'CLIENT', firstName: 'Demo', lastName: 'Client', password: 'ChangeMe123!' },
+    ];
+
+    const results = [];
+    for (const acc of accounts) {
+      const passwordHash = await bcrypt.hash(acc.password, 12);
+      const user = await this.prisma.user.upsert({
+        where: { email: acc.email },
+        update: {},
+        create: {
+          email: acc.email,
+          passwordHash,
+          firstName: acc.firstName,
+          lastName: acc.lastName,
+          role: acc.role,
+          status: 'ACTIVE',
+          wallet: { create: { balance: 100 } },
+        },
+      });
+      results.push({ email: user.email, role: user.role });
+    }
+
+    return { message: 'Demo accounts ready', accounts: results };
+  }
+
   async login(dto: LoginDto, ip: string, userAgent: string) {
     const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
 
