@@ -5,54 +5,80 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api, saveSession } from '@/lib/api';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [twoFactorCode, setTwoFactorCode] = useState('');
-  const [needsTwoFactor, setNeedsTwoFactor] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const { data } = await api.post('/auth/login', {
-        email,
-        password,
-        twoFactorCode: twoFactorCode || undefined,
-      });
+      await api.post('/auth/register', { email, password, firstName, lastName });
+
+      // auto-login right after successful registration
+      const { data } = await api.post('/auth/login', { email, password });
       saveSession(data.accessToken, data.refreshToken);
       router.push('/dashboard');
     } catch (err: any) {
       const message = err.response?.data?.message;
-      if (message === '2FA_REQUIRED' || message?.message === '2FA_REQUIRED') {
-        setNeedsTwoFactor(true);
-        setError('Enter your 6-digit 2FA code to continue.');
-      } else {
-        setError(
-          typeof message === 'string' ? message : message?.message || 'Login failed. Check your credentials.',
-        );
-      }
+      setError(typeof message === 'string' ? message : message?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center px-4 py-10">
       <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-white font-bold text-lg">
             OP
           </div>
           <h1 className="text-xl font-semibold">OTPProvider</h1>
-          <p className="mt-1 text-sm text-gray-500">Sign in to your account</p>
+          <p className="mt-1 text-sm text-gray-500">Create your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium">First name</label>
+              <input
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-800"
+                placeholder="John"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">Last name</label>
+              <input
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-800"
+                placeholder="Doe"
+              />
+            </div>
+          </div>
+
           <div>
             <label className="mb-1 block text-sm font-medium">Email</label>
             <input
@@ -73,24 +99,21 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-800"
-              placeholder="••••••••"
+              placeholder="At least 8 characters"
             />
           </div>
 
-          {needsTwoFactor && (
-            <div>
-              <label className="mb-1 block text-sm font-medium">2FA Code</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={twoFactorCode}
-                onChange={(e) => setTwoFactorCode(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-800"
-                placeholder="123456"
-              />
-            </div>
-          )}
+          <div>
+            <label className="mb-1 block text-sm font-medium">Confirm password</label>
+            <input
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-800"
+              placeholder="••••••••"
+            />
+          </div>
 
           {error && (
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950 dark:text-red-400">
@@ -103,18 +126,9 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-700 disabled:opacity-60"
           >
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? 'Creating account...' : 'Create account'}
           </button>
         </form>
-
-        <div className="mt-4 flex items-center justify-between text-xs">
-          <Link href="/forgot-password" className="font-medium text-brand-600 hover:underline">
-            Forgot password?
-          </Link>
-          <Link href="/register" className="font-medium text-brand-600 hover:underline">
-            Create an account
-          </Link>
-        </div>
 
         <div className="mt-5 flex items-center gap-3">
           <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
@@ -135,9 +149,10 @@ export default function LoginPage() {
         </button>
 
         <p className="mt-6 text-center text-xs text-gray-400">
-          One login for Super Admin, Admin, Support, Client &amp; Reseller.
-          <br />
-          Your dashboard adapts automatically to your role.
+          Already have an account?{' '}
+          <Link href="/login" className="font-medium text-brand-600 hover:underline">
+            Sign in
+          </Link>
         </p>
       </div>
     </div>
