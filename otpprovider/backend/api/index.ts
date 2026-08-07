@@ -15,6 +15,7 @@ import helmet from 'helmet';
 import serverlessHttp from 'serverless-http';
 import { AppModule } from '../src/app.module';
 import { AllExceptionsFilter } from '../src/common/filters/all-exceptions.filter';
+import { SubdomainMiddleware } from '../src/microsites/subdomain.middleware';
 
 let cachedHandler: ReturnType<typeof serverlessHttp> | null = null;
 
@@ -27,6 +28,13 @@ async function bootstrap() {
   });
 
   app.use(helmet());
+
+  // Runs on every request regardless of path, via a plain Express
+  // middleware (no route-pattern compilation), so it can never hit the
+  // path-to-regexp "wildcard route" crash. See microsites.module.ts.
+  const subdomainMiddleware = app.get(SubdomainMiddleware);
+  app.use((req: any, res: any, next: any) => subdomainMiddleware.use(req, res, next));
+
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(
     new ValidationPipe({
