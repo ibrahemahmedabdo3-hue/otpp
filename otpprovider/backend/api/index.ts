@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import serverlessHttp from 'serverless-http';
 import { AppModule } from '../src/app.module';
 import { AllExceptionsFilter } from '../src/common/filters/all-exceptions.filter';
+import { buildCorsOptions } from '../src/common/cors';
 import { SubdomainMiddleware } from '../src/microsites/subdomain.middleware';
 
 let cachedHandler: ReturnType<typeof serverlessHttp> | null = null;
