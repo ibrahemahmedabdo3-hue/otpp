@@ -33,6 +33,21 @@ html, body {
   0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.45); }
   100% { box-shadow: 0 0 0 14px rgba(37, 211, 102, 0); }
 }
+@keyframes orbit-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes dash-flow {
+  to { stroke-dashoffset: -24; }
+}
+@keyframes hub-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.35); }
+  100% { box-shadow: 0 0 0 26px rgba(249, 115, 22, 0); }
+}
+
+.animate-orbit-float { animation: orbit-float 4.5s ease-in-out infinite; }
+.animate-dash-flow { animation: dash-flow 1.2s linear infinite; }
+.animate-hub-pulse { animation: hub-pulse 2.2s ease-out infinite; }
 
 .animate-bubble-in { animation: bubble-in 0.5s cubic-bezier(.2,.8,.2,1) both; }
 .animate-otp-pop { animation: otp-pop 0.4s cubic-bezier(.2,.8,.2,1) both; }
@@ -45,7 +60,8 @@ html, body {
 
 @media (prefers-reduced-motion: reduce) {
   .animate-bubble-in, .animate-otp-pop, .animate-check-in,
-  .animate-ring-pulse, .animate-float-slow, .animate-wa-pulse {
+  .animate-ring-pulse, .animate-float-slow, .animate-wa-pulse,
+  .animate-orbit-float, .animate-dash-flow, .animate-hub-pulse {
     animation: none !important;
   }
 }
