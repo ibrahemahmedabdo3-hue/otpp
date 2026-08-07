@@ -80,7 +80,7 @@ export class AuthService {
       { email: 'client@otpprovider.com', role: 'CLIENT', firstName: 'Demo', lastName: 'Client', password: 'ChangeMe123!' },
     ];
 
-    const results = [];
+    const results: { email: string; role: string }[] = [];
     for (const acc of accounts) {
       const passwordHash = await bcrypt.hash(acc.password, 12);
       const user = await this.prisma.user.upsert({
