@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { SubdomainMiddleware } from './microsites/subdomain.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -15,6 +16,12 @@ async function bootstrap() {
   });
 
   app.use(helmet());
+
+  // See microsites.module.ts for why this is a plain app.use() instead of
+  // a NestModule forRoutes('*') wildcard.
+  const subdomainMiddleware = app.get(SubdomainMiddleware);
+  app.use((req: any, res: any, next: any) => subdomainMiddleware.use(req, res, next));
+
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(
     new ValidationPipe({
