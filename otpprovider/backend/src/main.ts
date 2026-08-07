@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { SubdomainMiddleware } from './microsites/subdomain.middleware';
+import { buildCorsOptions } from './common/cors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
