@@ -16,9 +16,8 @@ let cachedHandler: ReturnType<typeof serverlessHttp> | null = null;
 async function bootstrap() {
   const expressApp = express();
   const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp), {
-    cors: process.env.FRONTEND_URL && process.env.NODE_ENV === 'production'
-      ? { origin: process.env.FRONTEND_URL, credentials: true }
-      : true,
+   cors: buildCorsOptions(),
+    
   });
 
   app.use(helmet());
