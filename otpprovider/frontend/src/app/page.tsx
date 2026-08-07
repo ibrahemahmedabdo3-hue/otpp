@@ -109,6 +109,15 @@ const SERVICES = [
   },
 ];
 
+const ORBIT_ICONS = [
+  { icon: 'sms', xPct: 50, yPct: 8 },
+  { icon: 'whatsapp', xPct: 84, yPct: 27 },
+  { icon: 'mail', xPct: 84, yPct: 73 },
+  { icon: 'phone', xPct: 50, yPct: 92 },
+  { icon: 'lookup', xPct: 16, yPct: 73 },
+  { icon: 'check', xPct: 16, yPct: 27 },
+] as const;
+
 const STATS = [
   { value: '99.99%', label: { ar: 'نسبة التشغيل', en: 'Uptime SLA' } },
   { value: '<2s', label: { ar: 'متوسط وقت التسليم', en: 'Avg. delivery time' } },
@@ -232,13 +241,15 @@ export default function Home() {
         packages: isAr ? 'الباقات' : 'Pricing',
         testimonials: isAr ? 'آراء العملاء' : 'Customers',
         contact: isAr ? 'تواصل معنا' : 'Contact',
-        login: isAr ? 'دخول العملاء' : 'Client login',
+        login: isAr ? 'تسجيل الدخول' : 'Sign in',
+        register: isAr ? 'مستخدم جديد' : 'New user',
+        forgot: isAr ? 'نسيت كلمة المرور؟' : 'Forgot password?',
       },
       heroEyebrow: isAr ? 'بنية تحتية للتحقّق بخطوة واحدة' : 'One-time verification infrastructure',
-      heroTitle: isAr ? 'رمز التحقق يوصل، والعميل بيتأكد… في أقل من ثانيتين' : 'The code lands, the customer confirms — in under two seconds',
-      heroSub: isAr
-        ? 'OTPProvider يرسل رموز تحقق فورية عبر SMS وواتساب والمكالمة الصوتية والبريد الإلكتروني، بمعدل تسليم أعلى من 99% في أكثر من 180 دولة.'
-        : 'OTPProvider delivers instant SMS, WhatsApp, Voice and Email one-time codes with 99%+ delivery across 180+ countries.',
+      heroTitle: isAr ? 'بوابة التحقق الأسرع والأكثر أماناً لمنصتك' : 'The fastest, safest verification gateway for your platform',
+      heroBullets: isAr
+        ? ['تفعيل فوري للرسائل النصية SMS وواتساب والبريد الإلكتروني', 'دقة تسليم عالمية عبر مئات الممرات', 'حماية متكاملة ضد الاحتيال ومصادقة متعددة العوامل']
+        : ['Instant activation for SMS, WhatsApp and Email', 'Global delivery accuracy across hundreds of routes', 'Integrated fraud protection and multi-factor verification'],
       ctaPrimary: isAr ? 'اطلب عرض سعر' : 'Get a quote',
       ctaSecondary: isAr ? 'تواصل عبر واتساب' : 'Chat on WhatsApp',
       servicesEyebrow: isAr ? 'الخدمات' : 'Services',
@@ -284,49 +295,77 @@ export default function Home() {
   return (
     <div dir={isAr ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F7F7FB] text-ink-900 antialiased">
       {/* ---------------- Nav ---------------- */}
-      <header className="sticky top-0 z-40 border-b border-black/5 bg-[#F7F7FB]/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
+      <header className="sticky top-0 z-40 bg-ink-900 shadow-lg">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-sm font-bold text-white">OP</div>
-            <span className="text-lg font-bold">OTPProvider</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 text-white">
+              <Icon name="shield" className="h-5 w-5" />
+            </div>
+            <span className="text-lg font-extrabold text-white">
+              OTP<span className="text-brand-500">Provider</span>
+            </span>
           </div>
 
-          <nav className="hidden items-center gap-7 text-sm font-medium text-ink-700/80 md:flex">
-            <a href="#services" className="transition hover:text-ink-900">{t.nav.services}</a>
-            <a href="#packages" className="transition hover:text-ink-900">{t.nav.packages}</a>
-            <a href="#testimonials" className="transition hover:text-ink-900">{t.nav.testimonials}</a>
-            <a href="#contact" className="transition hover:text-ink-900">{t.nav.contact}</a>
+          <nav className="hidden items-center gap-6 text-sm font-medium text-white/70 md:flex">
+            <a href="#" className="border-b-2 border-brand-500 pb-1 text-white">{isAr ? 'الرئيسية' : 'Home'}</a>
+            <a href="#services" className="transition hover:text-white">{t.nav.services}</a>
+            <a href="#packages" className="transition hover:text-white">{t.nav.packages}</a>
+            <a href="#testimonials" className="transition hover:text-white">{t.nav.testimonials}</a>
+            <a href="#contact" className="transition hover:text-white">{t.nav.contact}</a>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={() => setLang(isAr ? 'en' : 'ar')}
-              className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-ink-700 transition hover:border-brand-600 hover:text-brand-600"
+              className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/80 transition hover:border-white/30 hover:text-white"
             >
               {isAr ? 'EN' : 'عربي'}
             </button>
-            <Link
-              href="/login"
-              className="hidden rounded-full bg-ink-900 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700 sm:inline-block"
-            >
-              {t.nav.login}
-            </Link>
+
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  className="rounded-lg bg-brand-600 px-4 py-1.5 text-xs font-bold text-white transition hover:bg-brand-700"
+                >
+                  {t.nav.login}
+                </Link>
+                <Link
+                  href="/register"
+                  className="rounded-lg bg-accent-500 px-4 py-1.5 text-xs font-bold text-white transition hover:bg-accent-600"
+                >
+                  {t.nav.register}
+                </Link>
+              </div>
+              <Link href="/forgot-password" className="text-[10px] font-medium text-white/50 transition hover:text-white/80">
+                {t.nav.forgot}
+              </Link>
+            </div>
           </div>
         </div>
       </header>
 
       {/* ---------------- Hero ---------------- */}
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-x-0 -top-24 h-[520px] bg-[radial-gradient(60%_60%_at_50%_0%,rgba(79,70,229,0.12),transparent)]" />
+      <section className="relative overflow-hidden bg-gradient-to-b from-brand-50/60 to-[#F7F7FB]">
         <div className="mx-auto grid max-w-6xl gap-12 px-5 pb-20 pt-14 md:grid-cols-2 md:items-center md:pb-28 md:pt-20">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-600/20 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
               {t.heroEyebrow}
             </span>
-            <h1 className="mt-5 text-4xl font-extrabold leading-[1.15] tracking-tight text-ink-900 md:text-5xl">
+            <h1 className="mt-5 text-4xl font-extrabold leading-[1.2] tracking-tight text-ink-900 md:text-[2.75rem]">
               {t.heroTitle}
             </h1>
-            <p className="mt-5 max-w-lg text-[15px] leading-7 text-ink-700/75">{t.heroSub}</p>
+
+            <ul className="mt-6 space-y-2.5">
+              {t.heroBullets.map((b: string) => (
+                <li key={b} className="flex items-start gap-2.5 text-[15px] leading-6 text-ink-700/75">
+                  <span className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand-600/10 text-brand-600">
+                    <Icon name="check" className="h-2.5 w-2.5" />
+                  </span>
+                  {b}
+                </li>
+              ))}
+            </ul>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a href="#contact" className="rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-700">
@@ -353,47 +392,41 @@ export default function Home() {
             </dl>
           </div>
 
-          {/* Signature: phone mockup receiving + verifying an OTP */}
-          <div className="relative mx-auto w-full max-w-sm animate-float-slow">
-            <div className="relative rounded-[2.2rem] border border-black/10 bg-ink-900 p-3 shadow-2xl">
-              <div className="rounded-[1.7rem] bg-white px-4 pb-6 pt-8">
-                <div className="mx-auto mb-6 h-1.5 w-16 rounded-full bg-black/10" />
+          {/* Signature: animated verification network — icons orbiting a central shield hub */}
+          <div className="relative mx-auto flex h-[380px] w-full max-w-md items-center justify-center md:h-[420px]">
+            <div className="absolute h-72 w-72 rounded-full bg-gradient-to-br from-brand-100/60 to-transparent md:h-80 md:w-80" />
+            <div className="absolute h-56 w-56 animate-[spin_40s_linear_infinite] rounded-full border border-dashed border-brand-500/25 md:h-64 md:w-64" />
 
-                <div className="animate-bubble-in rounded-2xl bg-gray-100 p-4" style={{ animationDelay: '0.2s' }}>
-                  <p className="text-[11px] font-semibold text-ink-700/50">OTPProvider</p>
-                  <p className="mt-1 text-sm text-ink-900">
-                    {isAr ? 'رمز التحقق الخاص بك هو' : 'Your verification code is'}{' '}
-                    <span className="font-mono font-bold tracking-widest">
-                      {['4', '8', '2', '9', '1', '3'].map((d, i) => (
-                        <span key={i} className="animate-otp-pop inline-block" style={{ animationDelay: `${0.5 + i * 0.08}s` }}>
-                          {d}
-                        </span>
-                      ))}
-                    </span>
-                  </p>
-                </div>
+            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+              {ORBIT_ICONS.map((o, i) => (
+                <line
+                  key={i}
+                  x1="50"
+                  y1="50"
+                  x2={o.xPct}
+                  y2={o.yPct}
+                  stroke="#2563eb"
+                  strokeOpacity="0.3"
+                  strokeWidth="0.5"
+                  strokeDasharray="2 2"
+                  className="animate-dash-flow"
+                />
+              ))}
+            </svg>
 
-                <div className="mt-5 flex items-center gap-3 rounded-2xl border border-mint-500/20 bg-mint-500/5 p-4 animate-bubble-in" style={{ animationDelay: '1.15s' }}>
-                  <span className="animate-ring-pulse flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mint-500 text-white">
-                    <span className="animate-check-in inline-flex" style={{ animationDelay: '1.3s' }}>
-                      <Icon name="check" className="h-5 w-5" />
-                    </span>
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-ink-900">{isAr ? 'تم التحقق بنجاح' : 'Verified successfully'}</p>
-                    <p className="text-[11px] text-ink-700/50">{isAr ? 'خلال 1.8 ثانية' : 'in 1.8 seconds'}</p>
-                  </div>
-                </div>
-
-                <div className="mt-6 grid grid-cols-3 gap-2">
-                  {['sms', 'whatsapp', 'phone'].map((ic) => (
-                    <div key={ic} className="flex flex-col items-center gap-1.5 rounded-xl bg-gray-50 py-3 text-ink-700/50">
-                      <Icon name={ic} className="h-4 w-4" />
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="animate-hub-pulse relative z-10 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-ink-900 to-brand-700 text-white shadow-2xl">
+              <Icon name="shield" className="h-10 w-10" />
             </div>
+
+            {ORBIT_ICONS.map((o, i) => (
+              <div
+                key={o.icon}
+                className="animate-orbit-float absolute z-10 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl bg-white text-brand-600 shadow-lg ring-1 ring-black/5"
+                style={{ left: `${o.xPct}%`, top: `${o.yPct}%`, animationDelay: `${i * 0.3}s` }}
+              >
+                <Icon name={o.icon} className="h-5 w-5" />
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -574,15 +607,50 @@ export default function Home() {
       </section>
 
       {/* ---------------- Footer ---------------- */}
-      <footer className="border-t border-black/5 bg-[#F7F7FB]">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 py-8 text-xs text-ink-700/50 sm:flex-row">
-          <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-600 text-[10px] font-bold text-white">OP</div>
-            <span>OTPProvider — {t.footerTag}</span>
+      <footer className="bg-ink-900">
+        <div className="mx-auto max-w-6xl px-5 py-12">
+          <div className="flex flex-col items-start justify-between gap-8 border-b border-white/10 pb-8 md:flex-row md:items-center">
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-white/80">
+                {isAr ? 'تواصل معنا' : 'Get in touch'}
+              </h3>
+              <div className="mt-3 flex flex-col gap-2 text-sm text-white/60 sm:flex-row sm:flex-wrap sm:gap-x-6">
+                <a href="mailto:sales@otpprovider.com" className="flex items-center gap-2 transition hover:text-white">
+                  <Icon name="mail" className="h-4 w-4" /> sales@otpprovider.com
+                </a>
+                <a href="mailto:support@otpprovider.com" className="flex items-center gap-2 transition hover:text-white">
+                  <Icon name="mail" className="h-4 w-4" /> support@otpprovider.com
+                </a>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              {Object.values(WHATSAPP).map((w) => (
+                <a
+                  key={w.number}
+                  href={waLink(w.number)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-xs font-semibold text-white/80 ring-1 ring-white/10 transition hover:bg-whatsapp/15 hover:text-white"
+                >
+                  <Icon name="whatsapp" className="h-3.5 w-3.5" />
+                  {w.flag} +{w.number}
+                </a>
+              ))}
+            </div>
           </div>
-          <p>
-            © {new Date().getFullYear()} OTPProvider. {t.footerRights}.
-          </p>
+
+          <div className="flex flex-col items-center justify-between gap-3 pt-6 text-xs text-white/40 sm:flex-row">
+            <div className="flex items-center gap-2">
+              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-brand-500 to-accent-500 text-white">
+                <Icon name="shield" className="h-3.5 w-3.5" />
+              </div>
+              <span>OTPProvider — {t.footerTag}</span>
+            </div>
+            <p>
+              © {new Date().getFullYear()} OTPProvider. {t.footerRights}.
+            </p>
+          </div>
         </div>
       </footer>
 
