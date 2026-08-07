@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import serverlessHttp from 'serverless-http';
 import { AppModule } from '../src/app.module';
 import { AllExceptionsFilter } from '../src/common/filters/all-exceptions.filter';
+import { buildCorsOptions } from '../src/common/cors';
 import { SubdomainMiddleware } from '../src/microsites/subdomain.middleware';
 
 let cachedHandler: ReturnType<typeof serverlessHttp> | null = null;
@@ -15,9 +16,8 @@ let cachedHandler: ReturnType<typeof serverlessHttp> | null = null;
 async function bootstrap() {
   const expressApp = express();
   const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp), {
-    cors: process.env.FRONTEND_URL && process.env.NODE_ENV === 'production'
-      ? { origin: process.env.FRONTEND_URL, credentials: true }
-      : true,
+   cors: buildCorsOptions(),
+    
   });
 
   app.use(helmet());
