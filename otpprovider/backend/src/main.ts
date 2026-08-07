@@ -10,9 +10,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     // In production, restrict to the deployed frontend origin; falls back
     // to allow-all in local dev so `docker compose up` works out of the box.
-    cors: process.env.FRONTEND_URL && process.env.NODE_ENV === 'production'
-      ? { origin: process.env.FRONTEND_URL, credentials: true }
-      : true,
+    cors: buildCorsOptions(),
+
+
   });
 
   app.use(helmet());
